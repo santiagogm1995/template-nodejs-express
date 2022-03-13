@@ -12,10 +12,6 @@ app.use(express.json());
 
 app.use(CustomLogger.http);
 
-if (process.env.ENV === undefined) {
-  config();
-}
-
 const options = {
   definition: {
     openapi: "3.0.0",
@@ -28,7 +24,13 @@ const options = {
   apis: ["./src/**/infra/*Controller.ts", "./src/user/domain/userDTO.ts"],
 };
 
-Security.setup(app);
+
+if (process.env.ENV === undefined) {
+  config();
+  Security.setup(app, true);
+} else Security.setup(app, true);
+
+
 Routes.run(app);
 const openapiSpecification = swaggerJSDoc(options);
 app.use("/api-docs", serve, setup(openapiSpecification));
